@@ -1,0 +1,19 @@
+{
+  "name": "tdd-node-ts-clean-arch",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rafaelvmasc/tdd-node-ts-clean-arch.git"
+  },
+  "author": "Rafael",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rafaelvmasc/tdd-node-ts-clean-arch/issues"
+  },
+  "homepage": "https://github.com/rafaelvmasc/tdd-node-ts-clean-arch#readme"
+}
