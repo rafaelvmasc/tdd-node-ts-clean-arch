@@ -1,25 +1,16 @@
 import { InvalidParamError, MissingParamError } from '../errors'
-import { HttpRequest, HttpResponse } from '../helpers'
+import { badRequest, HttpRequest, HttpResponse } from '../helpers'
 
 export class SignUpController {
   perform (httpRequest: HttpRequest): HttpResponse {
     if (!httpRequest.body.name) {
-      return {
-        statusCode: 400,
-        body: new MissingParamError('name')
-      }
+      return badRequest(new MissingParamError('name'))
     }
     if (!httpRequest.body.email) {
-      return {
-        statusCode: 400,
-        body: new MissingParamError('email')
-      }
+      return badRequest(new MissingParamError('email'))
     }
     if (!httpRequest.body.password) {
-      return {
-        statusCode: 400,
-        body: new MissingParamError('password')
-      }
+      return badRequest(new MissingParamError('password'))
     }
     if (httpRequest.body.password !== httpRequest.body.passwordConfirmation) {
       return {
