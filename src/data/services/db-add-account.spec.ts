@@ -1,9 +1,11 @@
+import { AddAccountRepository } from '../interfaces'
 import { PasswordEncrypter } from '../interfaces/password-encrypter'
 import { DbAddAccountService } from './db-add-account'
 
 interface SutTypes {
   sut: DbAddAccountService
   encrypterStub: PasswordEncrypter
+  addAccountRepositoryStub: AddAccountRepository
 }
 
 const makePasswordEncrypter = (): PasswordEncrypter => {
@@ -15,12 +17,29 @@ const makePasswordEncrypter = (): PasswordEncrypter => {
   return new EncrypterStub()
 }
 
+const makeaddAccountRepository = (): AddAccountRepository => {
+  class AddAccountRepositoryStub implements AddAccountRepository {
+    async add (params: AddAccountRepository.Params): Promise<AddAccountRepository.Result> {
+      const fakeAccount = {
+        email: 'valid_email',
+        id: 'valid_id',
+        name: 'valid_name',
+        password: 'valid_password'
+      }
+      return new Promise(resolve => resolve(fakeAccount))
+    }
+  }
+  return new AddAccountRepositoryStub()
+}
+
 const makeSut = (): SutTypes => {
   const encrypterStub = makePasswordEncrypter()
-  const sut = new DbAddAccountService(encrypterStub)
+  const addAccountRepositoryStub = makeaddAccountRepository()
+  const sut = new DbAddAccountService(encrypterStub, addAccountRepositoryStub)
   return {
     sut,
-    encrypterStub
+    encrypterStub,
+    addAccountRepositoryStub
   }
 }
 
@@ -47,5 +66,21 @@ describe('DBAddAccount Service', () => {
     }
     const promise = sut.execute(params)
     expect(promise).rejects.toThrow()
+  })
+
+  test('Should call AddAccountRepository with correct values', async () => {
+    const { sut, addAccountRepositoryStub } = makeSut()
+    const addSpy = jest.spyOn(addAccountRepositoryStub, 'add')
+    const params = {
+      name: 'valid_name',
+      password: 'valid_password',
+      email: 'valid_email'
+    }
+    await sut.execute(params)
+    expect(addSpy).toHaveBeenCalledWith({
+      name: 'valid_name',
+      password: 'hashed_password',
+      email: 'valid_email'
+    })
   })
 })
