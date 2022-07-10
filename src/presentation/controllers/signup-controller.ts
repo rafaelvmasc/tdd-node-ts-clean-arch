@@ -1,7 +1,8 @@
 import { InvalidParamError, MissingParamError } from '../errors'
+import { HttpRequest, HttpResponse } from '../helpers'
 
 export class SignUpController {
-  perform (httpRequest: any): any {
+  perform (httpRequest: HttpRequest): HttpResponse {
     if (!httpRequest.body.name) {
       return {
         statusCode: 400,
@@ -25,6 +26,11 @@ export class SignUpController {
         statusCode: 400,
         body: new InvalidParamError('passwordConfirmation')
       }
+    }
+
+    return {
+      statusCode: 200,
+      body: ''
     }
   }
 }
