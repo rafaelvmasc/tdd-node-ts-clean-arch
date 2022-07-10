@@ -1,3 +1,4 @@
+import { AddAccountUseCase } from '../../domain/usecases'
 import { InvalidParamError, MissingParamError } from '../errors'
 import { badRequest, HttpRequest, HttpResponse, serverError } from '../helpers'
 import { EmailValidator } from '../protocols'
@@ -5,6 +6,7 @@ import { Controller } from '../protocols/controller'
 
 export class SignUpController implements Controller {
   constructor (
+    private readonly addAccount: AddAccountUseCase,
     private readonly emailValidator: EmailValidator
   ) {}
 
@@ -16,7 +18,7 @@ export class SignUpController implements Controller {
           return badRequest(new MissingParamError(field))
         }
       }
-      const { email, password, passwordConfirmation } = httpRequest.body
+      const { email, password, passwordConfirmation, name } = httpRequest.body
       if (password !== passwordConfirmation) {
         return {
           statusCode: 400,
@@ -25,6 +27,9 @@ export class SignUpController implements Controller {
       }
       const isEmailValid = await this.emailValidator.isValid(email)
       if (!isEmailValid) return badRequest(new InvalidParamError('email'))
+
+      await this.addAccount.execute({ email, password, name })
+
       return {
         statusCode: 200,
         body: ''
