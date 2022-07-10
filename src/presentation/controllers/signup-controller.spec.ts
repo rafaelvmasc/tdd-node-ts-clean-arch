@@ -21,12 +21,13 @@ const makeEmailValidator = (): EmailValidator => {
 const makeAddAccount = (): AddAccountUseCase => {
   class AddAccountStub implements AddAccountUseCase {
     async execute (params: AddAccountUseCase.Params): Promise<AddAccountUseCase.Result> {
-      return {
+      const fakeAccount = {
         id: 'valid_id',
         email: 'valid_email@mail.com',
         name: 'valid_name',
         password: 'valid_password'
       }
+      return new Promise(resolve => resolve(fakeAccount))
     }
   }
   return new AddAccountStub()
@@ -182,8 +183,8 @@ describe('SignUp Controller', () => {
 
   test('Should return 500 if email validator throws', async () => {
     const { sut, addAccountStub } = makeSut()
-    jest.spyOn(addAccountStub, 'execute').mockImplementationOnce(() => {
-      throw new Error()
+    jest.spyOn(addAccountStub, 'execute').mockImplementationOnce(async () => {
+      return new Promise((resolve, reject) => reject(new Error()))
     })
     const httpRequest = {
       body: {
