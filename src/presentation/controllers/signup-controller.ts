@@ -1,9 +1,10 @@
 import { InvalidParamError, MissingParamError } from '../errors'
 import { badRequest, HttpRequest, HttpResponse } from '../helpers'
+import { Controller } from '../protocols/controller'
 
-export class SignUpController {
-  perform (httpRequest: HttpRequest): HttpResponse {
-    const requiredField = ['name', 'email', 'password']
+export class SignUpController implements Controller {
+  async perform (httpRequest: HttpRequest): Promise<HttpResponse> {
+    const requiredField = ['name', 'email', 'password', 'passwordConfirmation']
     for (const field of requiredField) {
       if (!httpRequest.body[field]) {
         return badRequest(new MissingParamError(field))
