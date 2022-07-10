@@ -23,8 +23,10 @@
   },
   "homepage": "https://github.com/rafaelvmasc/tdd-node-ts-clean-arch#readme",
   "devDependencies": {
+    "@shelf/jest-mongodb": "^3.0.2",
     "@types/bcryptjs": "^2.4.2",
     "@types/jest": "^28.1.4",
+    "@types/mongodb": "^4.0.7",
     "@types/node": "^18.0.3",
     "@types/validator": "^13.7.4",
     "@typescript-eslint/eslint-plugin": "^5.30.5",
@@ -42,6 +44,7 @@
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "mongodb": "^4.7.0",
     "validator": "^13.7.0"
   }
 }
