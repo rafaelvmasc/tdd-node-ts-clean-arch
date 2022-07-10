@@ -1,4 +1,4 @@
-import { EmailValidatorAdapter } from './email-validator'
+import { EmailValidatorAdapter } from './email-validator-adapter'
 import validator from 'validator'
 
 jest.mock('validator', () => ({
@@ -7,16 +7,17 @@ jest.mock('validator', () => ({
   }
 }))
 
+interface SutTypes {
+  sut: EmailValidatorAdapter
+}
+const makeSut = (): SutTypes => {
+  const sut = new EmailValidatorAdapter()
+  return {
+    sut
+  }
+}
+
 describe('EmailValidator Adapter', () => {
-  interface SutTypes {
-    sut: EmailValidatorAdapter
-  }
-  const makeSut = (): SutTypes => {
-    const sut = new EmailValidatorAdapter()
-    return {
-      sut
-    }
-  }
   test('Should return false if validator returns false', () => {
     const { sut } = makeSut()
     jest.spyOn(validator, 'isEmail').mockReturnValueOnce(false)
