@@ -36,4 +36,16 @@ describe('DBAddAccount Service', () => {
     await sut.execute(params)
     expect(encrypterSpy).toHaveBeenCalledWith(params.password)
   })
+
+  test('Should throw if encrypter throws', async () => {
+    const { sut, encrypterStub } = makeSut()
+    jest.spyOn(encrypterStub, 'encryptPassword').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+    const params = {
+      name: 'valid_name',
+      password: 'valid_password',
+      email: 'valid_email'
+    }
+    const promise = sut.execute(params)
+    expect(promise).rejects.toThrow()
+  })
 })
