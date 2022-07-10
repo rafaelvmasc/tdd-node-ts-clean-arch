@@ -83,4 +83,16 @@ describe('DBAddAccount Service', () => {
       email: 'valid_email'
     })
   })
+
+  test('Should throw if addAccountRepository throws', async () => {
+    const { sut, addAccountRepositoryStub } = makeSut()
+    jest.spyOn(addAccountRepositoryStub, 'add').mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+    const params = {
+      name: 'valid_name',
+      password: 'valid_password',
+      email: 'valid_email'
+    }
+    const promise = sut.execute(params)
+    expect(promise).rejects.toThrow()
+  })
 })
