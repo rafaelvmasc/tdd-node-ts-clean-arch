@@ -7,5 +7,7 @@ export interface ValidateCredentialsUseCase {
 export namespace ValidateCredentialsUseCase {
   export type Params = CredentialsEntity
 
-  export type Result = boolean
+  export type Result = {
+    token: string
+  } | false
 }
