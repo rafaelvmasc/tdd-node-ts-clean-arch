@@ -1,6 +1,6 @@
-import { AddAccountUseCase } from '../../domain/usecases'
-import { InvalidParamError, MissingParamError, ServerError } from '../errors'
-import { EmailValidator } from '../protocols'
+import { AddAccountUseCase } from '../../../domain/usecases'
+import { InvalidParamError, MissingParamError, ServerError } from '../../errors'
+import { EmailValidator } from '../../protocols'
 import { SignUpController } from './signup-controller'
 
 interface SutTypes {

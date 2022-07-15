@@ -1,5 +1,5 @@
-import { ValidateCredentialsUseCase } from '../../domain/usecases'
-import { MissingParamError } from '../errors'
+import { ValidateCredentialsUseCase } from '../../../domain/usecases'
+import { MissingParamError, ServerError } from '../../errors'
 import { LoginController } from './login-controller'
 
 interface SutTypes {
@@ -9,8 +9,10 @@ interface SutTypes {
 
 const makeValidateCredentialsStub = (): ValidateCredentialsUseCase => {
   class ValidateCredentialsStub implements ValidateCredentialsUseCase {
-    async perform (): Promise<boolean> {
-      return new Promise(resolve => resolve(true))
+    async perform (): Promise<ValidateCredentialsUseCase.Result> {
+      return new Promise(resolve => resolve({
+        token: 'valid_token'
+      }))
     }
   }
   return new ValidateCredentialsStub()
@@ -60,6 +62,7 @@ describe('Login Controller', () => {
     }
     const httpResponse = await sut.perform(httpRequest)
     expect(httpResponse.statusCode).toBe(200)
+    expect(httpResponse.body).toEqual({ token: 'valid_token' })
   })
 
   test('Should return 401 if credentials are not valid', async () => {
@@ -73,5 +76,34 @@ describe('Login Controller', () => {
     }
     const httpResponse = await sut.perform(httpRequest)
     expect(httpResponse.statusCode).toBe(401)
+  })
+
+  test('Should call validateCredentials with correct values', async () => {
+    const { sut, validateCredentialsStub } = makeSut()
+    const validateCredentialsSpy = jest.spyOn(validateCredentialsStub, 'perform')
+    const httpRequest = {
+      body: {
+        email: 'any_email@mail.com',
+        password: 'any_password'
+      }
+    }
+    await sut.perform(httpRequest)
+    expect(validateCredentialsSpy).toHaveBeenCalledWith(httpRequest.body)
+  })
+
+  test('Should return 500 if ValidateCredentials service throws', async () => {
+    const { sut, validateCredentialsStub } = makeSut()
+    jest.spyOn(validateCredentialsStub, 'perform').mockImplementationOnce(async () => {
+      return new Promise((resolve, reject) => reject(new Error()))
+    })
+    const httpRequest = {
+      body: {
+        email: 'any_email@mail.com',
+        password: 'any_password'
+      }
+    }
+    const httpResponse = await sut.perform(httpRequest)
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
   })
 })
