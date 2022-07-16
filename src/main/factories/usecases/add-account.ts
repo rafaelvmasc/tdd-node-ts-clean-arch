@@ -4,7 +4,8 @@ import { BCryptAdapter } from '../../../infra/cryptography/bcrypt-adapter'
 import { AccountRepository } from '../../../infra/database/mongodb/account-repository'
 
 export const makeAddAccountService = (): AddAccountUseCase => {
-  const encrypter = new BCryptAdapter(12)
+  const salt = 12
+  const encrypter = new BCryptAdapter(salt)
   const repository = new AccountRepository()
   return new DbAddAccountService(encrypter, repository)
 }
