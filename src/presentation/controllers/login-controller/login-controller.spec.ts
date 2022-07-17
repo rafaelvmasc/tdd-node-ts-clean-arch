@@ -1,29 +1,29 @@
-import { ValidateCredentialsUseCase } from '../../../domain/usecases'
+import { AuthenticationUseCase } from '../../../domain/usecases'
 import { MissingParamError, ServerError } from '../../errors'
 import { LoginController } from './login-controller'
 
 interface SutTypes {
   sut: LoginController
-  validateCredentialsStub: ValidateCredentialsUseCase
+  authenticationStub: AuthenticationUseCase
 }
 
-const makeValidateCredentialsStub = (): ValidateCredentialsUseCase => {
-  class ValidateCredentialsStub implements ValidateCredentialsUseCase {
-    async perform (): Promise<ValidateCredentialsUseCase.Result> {
+const makeAuthenticationStub = (): AuthenticationUseCase => {
+  class AuthenticationStub implements AuthenticationUseCase {
+    async perform (): Promise<AuthenticationUseCase.Result> {
       return new Promise(resolve => resolve({
         token: 'valid_token'
       }))
     }
   }
-  return new ValidateCredentialsStub()
+  return new AuthenticationStub()
 }
 
 const makeSut = (): SutTypes => {
-  const validateCredentialsStub = makeValidateCredentialsStub()
-  const sut = new LoginController(validateCredentialsStub)
+  const authenticationStub = makeAuthenticationStub()
+  const sut = new LoginController(authenticationStub)
   return {
     sut,
-    validateCredentialsStub
+    authenticationStub
   }
 }
 
@@ -66,8 +66,8 @@ describe('Login Controller', () => {
   })
 
   test('Should return 401 if credentials are not valid', async () => {
-    const { sut, validateCredentialsStub } = makeSut()
-    jest.spyOn(validateCredentialsStub, 'perform').mockReturnValueOnce(new Promise(resolve => resolve(false)))
+    const { sut, authenticationStub } = makeSut()
+    jest.spyOn(authenticationStub, 'perform').mockReturnValueOnce(new Promise(resolve => resolve(false)))
     const httpRequest = {
       body: {
         email: 'valid_email@mail.com',
@@ -79,8 +79,8 @@ describe('Login Controller', () => {
   })
 
   test('Should call validateCredentials with correct values', async () => {
-    const { sut, validateCredentialsStub } = makeSut()
-    const validateCredentialsSpy = jest.spyOn(validateCredentialsStub, 'perform')
+    const { sut, authenticationStub } = makeSut()
+    const validateCredentialsSpy = jest.spyOn(authenticationStub, 'perform')
     const httpRequest = {
       body: {
         email: 'any_email@mail.com',
@@ -92,8 +92,8 @@ describe('Login Controller', () => {
   })
 
   test('Should return 500 if ValidateCredentials service throws', async () => {
-    const { sut, validateCredentialsStub } = makeSut()
-    jest.spyOn(validateCredentialsStub, 'perform').mockImplementationOnce(async () => {
+    const { sut, authenticationStub } = makeSut()
+    jest.spyOn(authenticationStub, 'perform').mockImplementationOnce(async () => {
       return new Promise((resolve, reject) => reject(new Error()))
     })
     const httpRequest = {

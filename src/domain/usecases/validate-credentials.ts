@@ -1,10 +1,10 @@
 import { CredentialsEntity } from '../entities'
 
-export interface ValidateCredentialsUseCase {
-  perform: (params: ValidateCredentialsUseCase.Params) => Promise<ValidateCredentialsUseCase.Result>
+export interface AuthenticationUseCase {
+  perform: (params: AuthenticationUseCase.Params) => Promise<AuthenticationUseCase.Result>
 }
 
-export namespace ValidateCredentialsUseCase {
+export namespace AuthenticationUseCase {
   export type Params = CredentialsEntity
 
   export type Result = {

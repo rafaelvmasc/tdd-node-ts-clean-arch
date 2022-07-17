@@ -1,11 +1,11 @@
-import { ValidateCredentialsUseCase } from '../../../domain/usecases'
+import { AuthenticationUseCase } from '../../../domain/usecases'
 import { MissingParamError } from '../../errors'
 import { badRequest, HttpRequest, HttpResponse, serverError, success, unauthorized } from '../../helpers'
 import { Controller } from '../../protocols/controller'
 
 export class LoginController implements Controller {
   constructor (
-    private readonly validateCredentials: ValidateCredentialsUseCase
+    private readonly authentication: AuthenticationUseCase
   ) {}
 
   async perform (httpRequest: HttpRequest): Promise<HttpResponse> {
@@ -17,7 +17,7 @@ export class LoginController implements Controller {
         }
       }
       const { email, password } = httpRequest.body
-      const isAuthorized = await this.validateCredentials.perform({ email, password })
+      const isAuthorized = await this.authentication.perform({ email, password })
       if (!isAuthorized) return unauthorized()
       const { token } = isAuthorized
       return success({ token })
