@@ -1,11 +1,12 @@
 import { CredentialsEntity } from '../../../domain/entities'
 import { AuthenticationUseCase } from '../../../domain/usecases'
-import { LoadAccountByEmailRepository } from '../../interfaces/database'
+import { LoadAccountByEmailRepository, UpdateAccessTokenRepository } from '../../interfaces/database'
 import { HashComparer, JWTGenerator } from '../../interfaces/cryptography'
 
 export class DbAuthenticationUseCase implements AuthenticationUseCase {
   constructor (
     private readonly loadAccountByEmail: LoadAccountByEmailRepository,
+    private readonly updateAccessTokenRepository: UpdateAccessTokenRepository,
     private readonly hashComparer: HashComparer,
     private readonly jwtGenerator: JWTGenerator
   ) {}
@@ -20,6 +21,10 @@ export class DbAuthenticationUseCase implements AuthenticationUseCase {
       })
       if (isValid) {
         const token = await this.jwtGenerator.genToken(account.id)
+        await this.updateAccessTokenRepository.updateToken({
+          id: account.id,
+          token
+        })
         return { token }
       }
     }
