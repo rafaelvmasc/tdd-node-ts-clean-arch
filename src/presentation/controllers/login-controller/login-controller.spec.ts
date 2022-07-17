@@ -1,11 +1,13 @@
 import { AuthenticationUseCase } from '../../../domain/usecases'
 import { MissingParamError, ServerError } from '../../errors'
-import { unauthorized } from '../../helpers'
+import { badRequest, unauthorized } from '../../helpers'
+import { Validation } from '../../helpers/validators/validation'
 import { LoginController } from './login-controller'
 
 interface SutTypes {
   sut: LoginController
   authenticationStub: AuthenticationUseCase
+  validationStub: Validation
 }
 
 const makeAuthenticationStub = (): AuthenticationUseCase => {
@@ -19,40 +21,27 @@ const makeAuthenticationStub = (): AuthenticationUseCase => {
   return new AuthenticationStub()
 }
 
+const makeValidation = (): Validation => {
+  class ValidationStub implements Validation {
+    validate (input: any): Error | null {
+      return null
+    }
+  }
+  return new ValidationStub()
+}
+
 const makeSut = (): SutTypes => {
   const authenticationStub = makeAuthenticationStub()
-  const sut = new LoginController(authenticationStub)
+  const validationStub = makeValidation()
+  const sut = new LoginController(authenticationStub, validationStub)
   return {
     sut,
-    authenticationStub
+    authenticationStub,
+    validationStub
   }
 }
 
 describe('Login Controller', () => {
-  test('Should return 400 if no password is provided', async () => {
-    const { sut } = makeSut()
-    const httpRequest = {
-      body: {
-        email: 'any_email@mail.com'
-      }
-    }
-    const httpResponse = await sut.perform(httpRequest)
-    expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(new MissingParamError('password'))
-  })
-
-  test('Should return 400 if no email is provided', async () => {
-    const { sut } = makeSut()
-    const httpRequest = {
-      body: {
-        password: 'any_password'
-      }
-    }
-    const httpResponse = await sut.perform(httpRequest)
-    expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual(new MissingParamError('email'))
-  })
-
   test('Should return 200 on success', async () => {
     const { sut } = makeSut()
     const httpRequest = {
@@ -106,5 +95,18 @@ describe('Login Controller', () => {
     const httpResponse = await sut.perform(httpRequest)
     expect(httpResponse.statusCode).toBe(500)
     expect(httpResponse.body).toEqual(new ServerError())
+  })
+
+  test('Should return 400 if validation fails', async () => {
+    const { sut, validationStub } = makeSut()
+    jest.spyOn(validationStub, 'validate').mockReturnValueOnce(new MissingParamError('field'))
+    const httpRequest = {
+      body: {
+        email: 'any_email@mail.com',
+        password: 'any_password'
+      }
+    }
+    const httpResponse = await sut.perform(httpRequest)
+    expect(httpResponse).toEqual(badRequest(new MissingParamError('field')))
   })
 })
