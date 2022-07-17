@@ -14,10 +14,9 @@ export class LoginController implements Controller {
       const error = this.validation.validate(httpRequest.body)
       if (error) return badRequest(error)
       const { email, password } = httpRequest.body
-      const isAuthorized = await this.authentication.perform({ email, password })
-      if (!isAuthorized) return unauthorized()
-      const { token } = isAuthorized
-      return success({ token })
+      const token = await this.authentication.perform({ email, password })
+      if (!token) return unauthorized()
+      return success(token)
     } catch (error) {
       return serverError(error)
     }
