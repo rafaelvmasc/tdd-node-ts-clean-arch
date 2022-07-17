@@ -1,6 +1,6 @@
 import { AddAccountUseCase } from '../../../domain/usecases'
 import { InvalidParamError, MissingParamError, ServerError } from '../../errors'
-import { HttpRequest, success } from '../../helpers'
+import { badRequest, HttpRequest, success } from '../../helpers'
 import { Validation } from '../../helpers/validators/validation'
 import { EmailValidator } from '../../protocols'
 import { SignUpController } from './signup-controller'
@@ -207,5 +207,13 @@ describe('SignUp Controller', () => {
     const httpRequest = makeFakeRequest()
     await sut.perform(httpRequest)
     expect(validateSpy).toBeCalledWith(httpRequest.body)
+  })
+
+  test('Should 400 if validation returns an error', async () => {
+    const { sut, validationStub } = makeSut()
+    jest.spyOn(validationStub, 'validate').mockReturnValueOnce(new Error('any_error'))
+    const httpRequest = makeFakeRequest()
+    const httpResponse = await sut.perform(httpRequest)
+    expect(httpResponse).toEqual(badRequest(new Error('any_error')))
   })
 })
