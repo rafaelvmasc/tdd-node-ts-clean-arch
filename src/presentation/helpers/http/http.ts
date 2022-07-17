@@ -1,4 +1,4 @@
-import { ServerError, UnauthorizedError } from '../errors'
+import { ServerError, UnauthorizedError } from '../../errors'
 
 export interface HttpResponse {
   statusCode: number

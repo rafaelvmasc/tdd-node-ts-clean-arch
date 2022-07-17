@@ -1,6 +1,6 @@
 import { AddAccountUseCase } from '../../../domain/usecases'
 import { ServerError } from '../../errors'
-import { badRequest, HttpRequest, success } from '../../helpers'
+import { badRequest, HttpRequest, success } from '../../helpers/http/http'
 import { Validation } from '../../helpers/validators/validation'
 import { SignUpController } from './signup-controller'
 

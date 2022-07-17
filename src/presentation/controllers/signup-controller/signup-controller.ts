@@ -1,5 +1,5 @@
 import { AddAccountUseCase } from '../../../domain/usecases'
-import { badRequest, HttpRequest, HttpResponse, serverError, success } from '../../helpers'
+import { badRequest, HttpRequest, HttpResponse, serverError, success } from '../../helpers/http/http'
 import { Validation } from '../../helpers/validators/validation'
 import { Controller } from '../../protocols/controller'
 
