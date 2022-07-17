@@ -4,11 +4,12 @@ import { Controller } from '../../../presentation/protocols/controller'
 import { EmailValidatorAdapter } from '../../../utils/email-validator-adapter'
 import { LogControllerDecorator } from '../decorators/log'
 import { makeAddAccountService } from '../usecases/add-account'
+import { makeSignUpValidation } from './signup-validation-factory'
 
 export const makeSignUpController = (): Controller => {
   const addAccountService = makeAddAccountService()
   const emailValidator = new EmailValidatorAdapter()
   const logRepository = new LogMongoRepository()
-  const signUpController = new SignUpController(addAccountService, emailValidator)
+  const signUpController = new SignUpController(addAccountService, emailValidator, makeSignUpValidation())
   return new LogControllerDecorator(signUpController, logRepository)
 }
