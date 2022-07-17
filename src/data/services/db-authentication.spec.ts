@@ -1,6 +1,6 @@
 import { CredentialsEntity } from '../../domain/entities'
 import { JWTGenerator, ValidateUserCredentialsRepository } from '../interfaces'
-import { DbValidateCredentialsService } from './db-validate-credentials'
+import { DbValidateCredentialsService } from './db-authentication'
 
 interface SutTypes {
   sut: DbValidateCredentialsService

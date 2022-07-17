@@ -1,2 +1,2 @@
 export * from './add-account'
-export * from './validate-credentials'
+export * from './authentication'
