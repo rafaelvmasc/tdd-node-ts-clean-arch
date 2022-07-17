@@ -1,6 +1,6 @@
-import { LogErrorRepository } from '../../../data/interfaces'
-import { HttpRequest, HttpResponse, serverError } from '../../../presentation/helpers'
-import { Controller } from '../../../presentation/protocols/controller'
+import { LogErrorRepository } from '../../data/interfaces'
+import { HttpRequest, HttpResponse, serverError } from '../../presentation/helpers'
+import { Controller } from '../../presentation/protocols/controller'
 import { LogControllerDecorator } from './log'
 
 interface SutTypes {
