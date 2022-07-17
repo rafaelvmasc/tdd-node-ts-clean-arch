@@ -72,6 +72,20 @@ describe('DbValidateCredentials Service', () => {
     })
   })
 
+  test('Should throw if LoadAccountByEmailRepository throws', async () => {
+    const { sut, loadAccountByEmailRepositoryStub } = makeSut()
+    jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail')
+      .mockReturnValueOnce(
+        new Promise((resolve, reject) => reject(new Error()))
+      )
+    const params = {
+      email: 'any_email',
+      password: 'any_password'
+    }
+    const promise = sut.perform(params)
+    expect(promise).rejects.toThrow()
+  })
+
   test('Should call JWTGenerator with correct values', async () => {
     const { sut, jwtGeneratorStub } = makeSut()
     const params = {
@@ -85,18 +99,18 @@ describe('DbValidateCredentials Service', () => {
     })
   })
 
-  // test('Should throw if JWTGenerator throws', async () => {
-  //   const { sut, jwtGeneratorStub } = makeSut()
-  //   jest.spyOn(jwtGeneratorStub, 'genToken')
-  //     .mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
-  //   const params = {
-  //     email: 'valid_email',
-  //     password: 'valid_password'
-  //   }
-  //   const promise = await sut.perform(params)
+  test('Should throw if JWTGenerator throws', async () => {
+    const { sut, jwtGeneratorStub } = makeSut()
+    jest.spyOn(jwtGeneratorStub, 'genToken')
+      .mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
+    const params = {
+      email: 'valid_email',
+      password: 'valid_password'
+    }
+    const promise = sut.perform(params)
 
-  //   expect(promise).rejects.toThrow()
-  // })
+    expect(promise).rejects.toThrow()
+  })
 
   test('Should return a token on success', async () => {
     const { sut } = makeSut()
@@ -109,20 +123,6 @@ describe('DbValidateCredentials Service', () => {
       token: 'valid_token'
     })
   })
-
-  // test('Should throw if LoadAccountByEmailRepository throws', async () => {
-  //   const { sut, LoadAccountByEmailRepositoryStub } = makeSut()
-  //   jest.spyOn(LoadAccountByEmailRepositoryStub, 'loadByEmail')
-  //     .mockReturnValueOnce(
-  //       new Promise((resolve, reject) => reject(new Error()))
-  //     )
-  //   const params = {
-  //     email: 'any_email',
-  //     password: 'any_password'
-  //   }
-  //   const promise = await sut.perform(params)
-  //   expect(promise).rejects.toThrow()
-  // })
 
   test('Should call HashComparer with correct values', async () => {
     const { sut, hashComparerStub, loadAccountByEmailRepositoryStub } = makeSut()
