@@ -1,5 +1,5 @@
 import { AddAccountUseCase } from '../../../domain/usecases'
-import { InvalidParamError, MissingParamError } from '../../errors'
+import { InvalidParamError } from '../../errors'
 import { badRequest, HttpRequest, HttpResponse, serverError, success } from '../../helpers'
 import { Validation } from '../../helpers/validators/validation'
 import { EmailValidator } from '../../protocols'
@@ -16,12 +16,6 @@ export class SignUpController implements Controller {
     try {
       const error = this.validation.validate(httpRequest.body)
       if (error) return badRequest(error)
-      const requiredField = ['name', 'email', 'password', 'passwordConfirmation']
-      for (const field of requiredField) {
-        if (!httpRequest.body[field]) {
-          return badRequest(new MissingParamError(field))
-        }
-      }
       const { email, password, passwordConfirmation, name } = httpRequest.body
       if (password !== passwordConfirmation) {
         return {
