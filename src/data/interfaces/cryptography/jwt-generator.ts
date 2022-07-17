@@ -1,11 +1,9 @@
-import { CredentialsEntity } from '../../../domain/entities'
-
 export interface JWTGenerator {
-  genToken: (params: JWTGenerator.Params) => Promise<JWTGenerator.Result>
+  genToken: (id: JWTGenerator.Params) => Promise<JWTGenerator.Result>
 }
 
 export namespace JWTGenerator {
-  export type Params = Omit<CredentialsEntity, 'password'>
+  export type Params = string
 
   export type Result = string
 }

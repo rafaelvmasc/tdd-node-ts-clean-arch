@@ -1,4 +1,4 @@
-import { AccountEntity, CredentialsEntity } from '../../../domain/entities'
+import { AccountEntity } from '../../../domain/entities'
 import { LoadAccountByEmailRepository } from '../../interfaces/database'
 import { HashComparer, JWTGenerator } from '../../interfaces/cryptography'
 import { DbAuthenticationUseCase } from './db-authentication'
@@ -12,7 +12,7 @@ interface SutTypes {
 
 const makeJwtGeneratorStub = (): JWTGenerator => {
   class JwtGeneratorStub implements JWTGenerator {
-    async genToken (params: CredentialsEntity): Promise<string> {
+    async genToken (id: string): Promise<string> {
       return new Promise(resolve => resolve('valid_token'))
     }
   }
@@ -107,9 +107,7 @@ describe('DbValidateCredentials Service', () => {
     }
     const genTokenSpy = jest.spyOn(jwtGeneratorStub, 'genToken')
     await sut.perform(params)
-    expect(genTokenSpy).toHaveBeenCalledWith({
-      email: 'valid_email'
-    })
+    expect(genTokenSpy).toHaveBeenCalledWith('any_id')
   })
 
   test('Should throw if JWTGenerator throws', async () => {
@@ -162,5 +160,17 @@ describe('DbValidateCredentials Service', () => {
     }
     const promise = sut.perform(params)
     expect(promise).rejects.toThrow()
+  })
+
+  test('Should return null if HashComparer returns false', async () => {
+    const { sut, hashComparerStub } = makeSut()
+    jest.spyOn(hashComparerStub, 'compare').mockReturnValueOnce(
+      new Promise(resolve => resolve(false))
+    )
+    const token = await sut.perform({
+      email: 'any_email',
+      password: 'any_password'
+    })
+    expect(token).toBeNull()
   })
 })

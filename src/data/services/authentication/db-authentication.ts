@@ -14,11 +14,12 @@ export class DbAuthenticationUseCase implements AuthenticationUseCase {
     const { email, password } = params
     const account = await this.loadAccountByEmail.loadByEmail({ email })
     if (!account) return null
-    await this.hashComparer.compare({
+    const isValid = await this.hashComparer.compare({
       inputPassword: password,
       hashPassword: account.password
     })
-    const token = await this.jwtGenerator.genToken({ email })
+    if (!isValid) return null
+    const token = await this.jwtGenerator.genToken(account.id)
     return {
       token
     }
