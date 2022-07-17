@@ -9,5 +9,5 @@ export namespace LoadAccountByEmailRepository {
     email: string
   }
 
-  export type Result = AccountEntity
+  export type Result = AccountEntity | null
 }

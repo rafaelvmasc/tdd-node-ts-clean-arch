@@ -13,6 +13,7 @@ export class DbAuthenticationUseCase implements AuthenticationUseCase {
   async perform (params: CredentialsEntity): Promise<AuthenticationUseCase.Result> {
     const { email, password } = params
     const account = await this.loadAccountByEmail.loadByEmail({ email })
+    if (!account) return null
     await this.hashComparer.compare({
       inputPassword: password,
       hashPassword: account.password

@@ -86,6 +86,19 @@ describe('DbValidateCredentials Service', () => {
     expect(promise).rejects.toThrow()
   })
 
+  test('Should return null if LoadAccountByEmailRepository returns null', async () => {
+    const { sut, loadAccountByEmailRepositoryStub } = makeSut()
+    jest.spyOn(loadAccountByEmailRepositoryStub, 'loadByEmail').mockReturnValueOnce(
+      new Promise(resolve => resolve(null))
+    )
+    const params = {
+      email: 'any_email',
+      password: 'any_password'
+    }
+    const token = await sut.perform(params)
+    expect(token).toBeFalsy()
+  })
+
   test('Should call JWTGenerator with correct values', async () => {
     const { sut, jwtGeneratorStub } = makeSut()
     const params = {
@@ -135,7 +148,7 @@ describe('DbValidateCredentials Service', () => {
     await sut.perform(params)
     expect(compareSpy).toHaveBeenCalledWith({
       inputPassword: 'any_password',
-      hashPassword: account.password
+      hashPassword: account?.password
     })
   })
 })
