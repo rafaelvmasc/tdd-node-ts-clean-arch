@@ -5,7 +5,7 @@ import { AccountRepository } from '../../../infra/database/mongodb/account-repos
 
 export const makeAddAccountService = (): AddAccountUseCase => {
   const salt = 12
-  const encrypter = new BCryptAdapter(salt)
+  const hasher = new BCryptAdapter(salt)
   const repository = new AccountRepository()
-  return new DbAddAccountService(encrypter, repository)
+  return new DbAddAccountService(hasher, repository)
 }
