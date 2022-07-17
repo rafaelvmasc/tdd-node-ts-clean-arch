@@ -1,7 +1,7 @@
 import { AddAccountUseCase } from '../../../domain/usecases'
 import { ServerError } from '../../errors'
 import { badRequest, HttpRequest, success } from '../../helpers/http/http'
-import { Validation } from '../../helpers/validators/validation'
+import { Validation } from '../../protocols/validation'
 import { SignUpController } from './signup-controller'
 
 interface SutTypes {

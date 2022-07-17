@@ -1,7 +1,7 @@
 import { AuthenticationUseCase } from '../../../domain/usecases'
 import { MissingParamError, ServerError } from '../../errors'
 import { badRequest, unauthorized } from '../../helpers/http/http'
-import { Validation } from '../../helpers/validators/validation'
+import { Validation } from '../../protocols/validation'
 import { LoginController } from './login-controller'
 
 interface SutTypes {
