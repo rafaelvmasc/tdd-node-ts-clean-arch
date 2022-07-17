@@ -150,4 +150,17 @@ describe('DbValidateCredentials Service', () => {
       hashPassword: 'hashed_password'
     })
   })
+
+  test('Should throw if HashComparer throws', async () => {
+    const { sut, hashComparerStub } = makeSut()
+    jest.spyOn(hashComparerStub, 'compare').mockReturnValueOnce(
+      new Promise((resolve, reject) => reject(new Error()))
+    )
+    const params = {
+      email: 'any_email',
+      password: 'any_password'
+    }
+    const promise = sut.perform(params)
+    expect(promise).rejects.toThrow()
+  })
 })
