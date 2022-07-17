@@ -13,15 +13,16 @@ export class DbAuthenticationUseCase implements AuthenticationUseCase {
   async perform (params: CredentialsEntity): Promise<AuthenticationUseCase.Result> {
     const { email, password } = params
     const account = await this.loadAccountByEmail.loadByEmail({ email })
-    if (!account) return null
-    const isValid = await this.hashComparer.compare({
-      inputPassword: password,
-      hashPassword: account.password
-    })
-    if (!isValid) return null
-    const token = await this.jwtGenerator.genToken(account.id)
-    return {
-      token
+    if (account) {
+      const isValid = await this.hashComparer.compare({
+        inputPassword: password,
+        hashPassword: account.password
+      })
+      if (isValid) {
+        const token = await this.jwtGenerator.genToken(account.id)
+        return { token }
+      }
     }
+    return null
   }
 }

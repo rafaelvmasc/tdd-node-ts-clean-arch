@@ -129,8 +129,8 @@ describe('DbValidateCredentials Service', () => {
       email: 'any_email@mail.com',
       password: 'any_password'
     }
-    const result = await sut.perform(params)
-    expect(result).toEqual({
+    const token = await sut.perform(params)
+    expect(token).toEqual({
       token: 'valid_token'
     })
   })
