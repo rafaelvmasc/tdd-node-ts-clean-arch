@@ -1,5 +1,6 @@
 import { AuthenticationUseCase } from '../../../domain/usecases'
 import { MissingParamError, ServerError } from '../../errors'
+import { unauthorized } from '../../helpers'
 import { LoginController } from './login-controller'
 
 interface SutTypes {
@@ -75,7 +76,7 @@ describe('Login Controller', () => {
       }
     }
     const httpResponse = await sut.perform(httpRequest)
-    expect(httpResponse.statusCode).toBe(401)
+    expect(httpResponse).toEqual(unauthorized())
   })
 
   test('Should call validateCredentials with correct values', async () => {

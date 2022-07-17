@@ -22,7 +22,6 @@ export class LoginController implements Controller {
       const { token } = isAuthorized
       return success({ token })
     } catch (error) {
-      console.error(error)
       return serverError(error)
     }
   }
