@@ -138,17 +138,16 @@ describe('DbValidateCredentials Service', () => {
   })
 
   test('Should call HashComparer with correct values', async () => {
-    const { sut, hashComparerStub, loadAccountByEmailRepositoryStub } = makeSut()
+    const { sut, hashComparerStub } = makeSut()
     const compareSpy = jest.spyOn(hashComparerStub, 'compare')
     const params = {
       email: 'any_email',
       password: 'any_password'
     }
-    const account = await loadAccountByEmailRepositoryStub.loadByEmail({ email: params.email })
     await sut.perform(params)
     expect(compareSpy).toHaveBeenCalledWith({
       inputPassword: 'any_password',
-      hashPassword: account?.password
+      hashPassword: 'hashed_password'
     })
   })
 })
