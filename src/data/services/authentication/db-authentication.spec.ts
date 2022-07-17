@@ -198,4 +198,17 @@ describe('DbValidateCredentials Service', () => {
       id: 'any_id'
     })
   })
+
+  test('Should throw if UpdateAccessTokenRepository throws', async () => {
+    const { sut, updateAccessTokenRepositoryStub } = makeSut()
+    jest.spyOn(updateAccessTokenRepositoryStub, 'updateToken').mockReturnValueOnce(
+      new Promise((resolve, reject) => reject(new Error()))
+    )
+    const params = {
+      email: 'any_email',
+      password: 'any_password'
+    }
+    const promise = sut.perform(params)
+    expect(promise).rejects.toThrow()
+  })
 })
