@@ -1,7 +1,7 @@
-import { AccountEntity } from '../../domain/entities'
-import { AddAccountUseCase } from '../../domain/usecases'
-import { AddAccountRepository } from '../interfaces'
-import { PasswordEncrypter } from '../interfaces/password-encrypter'
+import { AccountEntity } from '../../../domain/entities'
+import { AddAccountUseCase } from '../../../domain/usecases'
+import { AddAccountRepository } from '../../interfaces/database'
+import { PasswordEncrypter } from '../../interfaces/cryptography/password-encrypter'
 
 export class DbAddAccountService implements AddAccountUseCase {
   constructor (

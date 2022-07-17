@@ -1,5 +1,5 @@
-import { AddAccountRepository } from '../interfaces'
-import { PasswordEncrypter } from '../interfaces/password-encrypter'
+import { AddAccountRepository } from '../../interfaces/database'
+import { PasswordEncrypter } from '../../interfaces/cryptography/password-encrypter'
 import { DbAddAccountService } from './db-add-account'
 
 interface SutTypes {

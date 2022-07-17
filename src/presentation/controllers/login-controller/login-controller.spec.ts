@@ -57,7 +57,7 @@ describe('Login Controller', () => {
 
   test('Should return 401 if credentials are not valid', async () => {
     const { sut, authenticationStub } = makeSut()
-    jest.spyOn(authenticationStub, 'perform').mockReturnValueOnce(new Promise(resolve => resolve(false)))
+    jest.spyOn(authenticationStub, 'perform').mockReturnValueOnce(new Promise(resolve => resolve(null)))
     const httpRequest = {
       body: {
         email: 'valid_email@mail.com',

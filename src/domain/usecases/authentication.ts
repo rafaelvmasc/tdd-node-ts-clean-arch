@@ -9,5 +9,5 @@ export namespace AuthenticationUseCase {
 
   export type Result = {
     token: string
-  } | false
+  } | null
 }

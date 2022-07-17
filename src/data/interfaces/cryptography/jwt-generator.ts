@@ -1,4 +1,4 @@
-import { CredentialsEntity } from '../../domain/entities'
+import { CredentialsEntity } from '../../../domain/entities'
 
 export interface JWTGenerator {
   genToken: (params: JWTGenerator.Params) => Promise<JWTGenerator.Result>

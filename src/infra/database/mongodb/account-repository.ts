@@ -1,4 +1,4 @@
-import { AddAccountRepository } from '../../../data/interfaces'
+import { AddAccountRepository } from '../../../data/interfaces/database'
 import { MongoHelper } from './helpers/mongo-helper'
 
 export class AccountRepository implements AddAccountRepository {

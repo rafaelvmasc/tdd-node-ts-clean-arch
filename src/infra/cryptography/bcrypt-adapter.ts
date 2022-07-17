@@ -1,4 +1,4 @@
-import { PasswordEncrypter } from '../../data/interfaces'
+import { PasswordEncrypter } from '../../data/interfaces/cryptography'
 import bcryptjs from 'bcryptjs'
 
 export class BCryptAdapter implements PasswordEncrypter {
