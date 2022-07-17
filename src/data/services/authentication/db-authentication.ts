@@ -1,14 +1,14 @@
 import { CredentialsEntity } from '../../../domain/entities'
 import { AuthenticationUseCase } from '../../../domain/usecases'
 import { LoadAccountByEmailRepository, UpdateAccessTokenRepository } from '../../interfaces/database'
-import { HashComparer, JWTGenerator } from '../../interfaces/cryptography'
+import { HashComparer, Encrypter } from '../../interfaces/cryptography'
 
 export class DbAuthenticationUseCase implements AuthenticationUseCase {
   constructor (
     private readonly loadAccountByEmail: LoadAccountByEmailRepository,
     private readonly updateAccessTokenRepository: UpdateAccessTokenRepository,
     private readonly hashComparer: HashComparer,
-    private readonly jwtGenerator: JWTGenerator
+    private readonly encrypter: Encrypter
   ) {}
 
   async perform (params: CredentialsEntity): Promise<AuthenticationUseCase.Result> {
@@ -20,7 +20,7 @@ export class DbAuthenticationUseCase implements AuthenticationUseCase {
         hashPassword: account.password
       })
       if (isValid) {
-        const token = await this.jwtGenerator.genToken(account.id)
+        const token = await this.encrypter.encrypt(account.id)
         await this.updateAccessTokenRepository.updateToken({
           id: account.id,
           token

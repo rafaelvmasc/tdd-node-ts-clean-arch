@@ -1,19 +1,19 @@
 import { AccountEntity } from '../../../domain/entities'
 import { LoadAccountByEmailRepository, UpdateAccessTokenRepository } from '../../interfaces/database'
-import { HashComparer, JWTGenerator } from '../../interfaces/cryptography'
+import { HashComparer, Encrypter } from '../../interfaces/cryptography'
 import { DbAuthenticationUseCase } from './db-authentication'
 
 interface SutTypes {
   sut: DbAuthenticationUseCase
   loadAccountByEmailRepositoryStub: LoadAccountByEmailRepository
-  jwtGeneratorStub: JWTGenerator
+  encrypterStub: Encrypter
   hashComparerStub: HashComparer
   updateAccessTokenRepositoryStub: UpdateAccessTokenRepository
 }
 
-const makeJwtGeneratorStub = (): JWTGenerator => {
-  class JwtGeneratorStub implements JWTGenerator {
-    async genToken (id: string): Promise<string> {
+const makeJwtGeneratorStub = (): Encrypter => {
+  class JwtGeneratorStub implements Encrypter {
+    async encrypt (id: string): Promise<string> {
       return new Promise(resolve => resolve('valid_token'))
     }
   }
@@ -56,14 +56,14 @@ const makeHashComparer = (): HashComparer => {
 
 const makeSut = (): SutTypes => {
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepositoryStub()
-  const jwtGeneratorStub = makeJwtGeneratorStub()
+  const encrypterStub = makeJwtGeneratorStub()
   const hashComparerStub = makeHashComparer()
   const updateAccessTokenRepositoryStub = makeUpdateAccessTokenRepositoryStub()
-  const sut = new DbAuthenticationUseCase(loadAccountByEmailRepositoryStub, updateAccessTokenRepositoryStub, hashComparerStub, jwtGeneratorStub)
+  const sut = new DbAuthenticationUseCase(loadAccountByEmailRepositoryStub, updateAccessTokenRepositoryStub, hashComparerStub, encrypterStub)
   return {
     sut,
     loadAccountByEmailRepositoryStub,
-    jwtGeneratorStub,
+    encrypterStub,
     hashComparerStub,
     updateAccessTokenRepositoryStub
   }
@@ -111,20 +111,20 @@ describe('DbValidateCredentials Service', () => {
     expect(token).toBeFalsy()
   })
 
-  test('Should call JWTGenerator with correct values', async () => {
-    const { sut, jwtGeneratorStub } = makeSut()
+  test('Should call Encrypter with correct values', async () => {
+    const { sut, encrypterStub } = makeSut()
     const params = {
       email: 'valid_email',
       password: 'valid_password'
     }
-    const genTokenSpy = jest.spyOn(jwtGeneratorStub, 'genToken')
+    const encryptSpy = jest.spyOn(encrypterStub, 'encrypt')
     await sut.perform(params)
-    expect(genTokenSpy).toHaveBeenCalledWith('any_id')
+    expect(encryptSpy).toHaveBeenCalledWith('any_id')
   })
 
-  test('Should throw if JWTGenerator throws', async () => {
-    const { sut, jwtGeneratorStub } = makeSut()
-    jest.spyOn(jwtGeneratorStub, 'genToken')
+  test('Should throw if Encrypter throws', async () => {
+    const { sut, encrypterStub } = makeSut()
+    jest.spyOn(encrypterStub, 'encrypt')
       .mockReturnValueOnce(new Promise((resolve, reject) => reject(new Error())))
     const params = {
       email: 'valid_email',

@@ -1,8 +1,8 @@
-export interface JWTGenerator {
-  genToken: (id: JWTGenerator.Params) => Promise<JWTGenerator.Result>
+export interface Encrypter {
+  encrypt: (value: Encrypter.Params) => Promise<Encrypter.Result>
 }
 
-export namespace JWTGenerator {
+export namespace Encrypter {
   export type Params = string
 
   export type Result = string
