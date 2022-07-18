@@ -1,6 +1,6 @@
 import { Collection } from 'mongodb'
 import { AccountRepository } from './account-repository'
-import { MongoHelper } from './helpers/mongo-helper'
+import { MongoHelper } from '../helpers/mongo-helper'
 
 interface SutTypes {
   sut: AccountRepository
