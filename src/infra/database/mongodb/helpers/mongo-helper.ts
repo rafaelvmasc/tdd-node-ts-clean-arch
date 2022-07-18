@@ -23,6 +23,6 @@ export const MongoHelper = {
 
   map (document: any): any {
     const { _id, ...rest } = document
-    return { ...rest, id: _id.toString() }
+    return { ...rest, id: _id.toHexString() }
   }
 }
