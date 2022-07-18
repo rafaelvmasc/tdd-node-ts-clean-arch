@@ -14,7 +14,15 @@ export const MongoHelper = {
     this.client = null
   },
 
-  getCollection (name: string): Collection {
+  async getCollection (name: string): Promise<Collection> {
+    if (!this.client) {
+      await this.connect(this.uri)
+    }
     return this.client.db().collection(name)
+  },
+
+  map (document: any): any {
+    const { _id, ...rest } = document
+    return { ...rest, id: _id.toHexString() }
   }
 }
