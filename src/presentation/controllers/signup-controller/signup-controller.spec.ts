@@ -1,4 +1,4 @@
-import { AddAccountUseCase, LoadUserUseCase } from '../../../domain/usecases'
+import { AddAccountUseCase } from '../../../domain/usecases'
 import { ServerError } from '../../errors'
 import { badRequest, HttpRequest, success } from '../../helpers/http/http'
 import { Validation } from '../../protocols/validation'
@@ -7,7 +7,6 @@ import { SignUpController } from './signup-controller'
 interface SutTypes {
   sut: SignUpController
   addAccountStub: AddAccountUseCase
-  loadUserStub: LoadUserUseCase
   validationStub: Validation
 }
 
@@ -31,15 +30,6 @@ const makeFakeRequest = (): HttpRequest => {
   }
 }
 
-const makeLoadUser = (): LoadUserUseCase => {
-  class LoadUserStub implements LoadUserUseCase {
-    async execute (params: LoadUserUseCase.Params): Promise<LoadUserUseCase.Result> {
-      return new Promise(resolve => resolve(null))
-    }
-  }
-  return new LoadUserStub()
-}
-
 const makeAddAccount = (): AddAccountUseCase => {
   class AddAccountStub implements AddAccountUseCase {
     async execute (
@@ -59,14 +49,12 @@ const makeAddAccount = (): AddAccountUseCase => {
 
 const makeSut = (): SutTypes => {
   const addAccountStub = makeAddAccount()
-  const loadUserStub = makeLoadUser()
   const validationStub = makeValidation()
-  const sut = new SignUpController(addAccountStub,loadUserStub, validationStub)
+  const sut = new SignUpController(addAccountStub, validationStub)
   return {
     sut,
     addAccountStub,
-    validationStub,
-    loadUserStub
+    validationStub
   }
 }
 
@@ -124,13 +112,9 @@ describe('SignUp Controller', () => {
   })
 
   test('Should return 409 if email is already used', async () => {
-    const { sut, loadUserStub } = makeSut()
-    jest.spyOn(loadUserStub, 'execute')
-      .mockReturnValueOnce(new Promise(resolve => resolve({
-        email: 'already_used_email',
-        name: 'any_name',
-        id: 'any_id'
-      })))
+    const { sut, addAccountStub } = makeSut()
+    jest.spyOn(addAccountStub, 'execute')
+      .mockReturnValueOnce(new Promise(resolve => resolve(null)))
     const httpRequest = {
       body: {
         email: 'already_used_email',
@@ -140,19 +124,5 @@ describe('SignUp Controller', () => {
     }
     const httpResponse = await sut.perform(httpRequest)
     expect(httpResponse.statusCode).toBe(409)
-  })
-
-  test('Should call LoadUser with correct email', async () => {
-    const { sut, loadUserStub } = makeSut()
-    const executeSpy = jest.spyOn(loadUserStub, 'execute')
-    const httpRequest = {
-      body: {
-        email: 'any_email',
-        name: 'valid_name',
-        password: 'valid_password'
-      }
-    }
-    await sut.perform(httpRequest)
-    expect(executeSpy).toHaveBeenCalledWith({ email: 'any_email' })
   })
 })
