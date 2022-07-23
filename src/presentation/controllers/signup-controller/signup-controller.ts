@@ -15,7 +15,7 @@ export class SignUpController implements Controller {
       if (error) return badRequest(error)
       const { email, password, name } = httpRequest.body
       const result = await this.addAccount.execute({ email, password, name })
-      if (!result) return conflict()
+      if (!result) return conflict(`${email} is already in use`)
 
       return success(result)
     } catch (error) {

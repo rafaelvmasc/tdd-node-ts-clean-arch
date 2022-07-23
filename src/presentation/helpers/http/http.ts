@@ -29,7 +29,7 @@ export const unauthorized = (): HttpResponse => ({
   body: new UnauthorizedError()
 })
 
-export const conflict = (): HttpResponse => ({
+export const conflict = (message: string): HttpResponse => ({
   statusCode: 409,
-  body: new ConflictError()
+  body: new ConflictError(message)
 })

@@ -1,6 +1,6 @@
 import { AddAccountUseCase } from '../../../domain/usecases'
 import { ServerError } from '../../errors'
-import { badRequest, HttpRequest, success } from '../../helpers/http/http'
+import { badRequest, conflict, HttpRequest, success } from '../../helpers/http/http'
 import { Validation } from '../../protocols/validation'
 import { SignUpController } from './signup-controller'
 
@@ -123,6 +123,6 @@ describe('SignUp Controller', () => {
       }
     }
     const httpResponse = await sut.perform(httpRequest)
-    expect(httpResponse.statusCode).toBe(409)
+    expect(httpResponse).toEqual(conflict('already_used_email is already in use'))
   })
 })
