@@ -1,4 +1,4 @@
-import { AddAccountUseCase } from '../../../domain/usecases'
+import { AddAccountUseCase, LoadUserUseCase } from '../../../domain/usecases'
 import { ServerError } from '../../errors'
 import { badRequest, HttpRequest, success } from '../../helpers/http/http'
 import { Validation } from '../../protocols/validation'
@@ -7,6 +7,7 @@ import { SignUpController } from './signup-controller'
 interface SutTypes {
   sut: SignUpController
   addAccountStub: AddAccountUseCase
+  loadUserStub: LoadUserUseCase
   validationStub: Validation
 }
 
@@ -30,16 +31,27 @@ const makeFakeRequest = (): HttpRequest => {
   }
 }
 
+const makeLoadUser = (): LoadUserUseCase => {
+  class LoadUserStub implements LoadUserUseCase {
+    async execute (params: LoadUserUseCase.Params): Promise<LoadUserUseCase.Result> {
+      return new Promise(resolve => resolve(null))
+    }
+  }
+  return new LoadUserStub()
+}
+
 const makeAddAccount = (): AddAccountUseCase => {
   class AddAccountStub implements AddAccountUseCase {
-    async execute (params: AddAccountUseCase.Params): Promise<AddAccountUseCase.Result> {
+    async execute (
+      params: AddAccountUseCase.Params
+    ): Promise<AddAccountUseCase.Result> {
       const fakeAccount = {
         id: 'valid_id',
         email: 'valid_email@mail.com',
         name: 'valid_name',
         password: 'valid_password'
       }
-      return new Promise(resolve => resolve(fakeAccount))
+      return new Promise((resolve) => resolve(fakeAccount))
     }
   }
   return new AddAccountStub()
@@ -47,12 +59,14 @@ const makeAddAccount = (): AddAccountUseCase => {
 
 const makeSut = (): SutTypes => {
   const addAccountStub = makeAddAccount()
+  const loadUserStub = makeLoadUser()
   const validationStub = makeValidation()
-  const sut = new SignUpController(addAccountStub, validationStub)
+  const sut = new SignUpController(addAccountStub,loadUserStub, validationStub)
   return {
     sut,
     addAccountStub,
-    validationStub
+    validationStub,
+    loadUserStub
   }
 }
 
@@ -81,12 +95,14 @@ describe('SignUp Controller', () => {
     const { sut } = makeSut()
     const httpRequest = makeFakeRequest()
     const httpResponse = await sut.perform(httpRequest)
-    expect(httpResponse).toEqual(success({
-      id: 'valid_id',
-      name: 'valid_name',
-      password: 'valid_password',
-      email: 'valid_email@mail.com'
-    }))
+    expect(httpResponse).toEqual(
+      success({
+        id: 'valid_id',
+        name: 'valid_name',
+        password: 'valid_password',
+        email: 'valid_email@mail.com'
+      })
+    )
   })
 
   test('Should call Validation with correct values', async () => {
@@ -99,9 +115,30 @@ describe('SignUp Controller', () => {
 
   test('Should 400 if validation returns an error', async () => {
     const { sut, validationStub } = makeSut()
-    jest.spyOn(validationStub, 'validate').mockReturnValueOnce(new Error('any_error'))
+    jest
+      .spyOn(validationStub, 'validate')
+      .mockReturnValueOnce(new Error('any_error'))
     const httpRequest = makeFakeRequest()
     const httpResponse = await sut.perform(httpRequest)
     expect(httpResponse).toEqual(badRequest(new Error('any_error')))
+  })
+
+  test('Should return 409 if email is already used', async () => {
+    const { sut, loadUserStub } = makeSut()
+    jest.spyOn(loadUserStub, 'execute')
+      .mockReturnValueOnce(new Promise(resolve => resolve({
+        email: 'already_used_email',
+        name: 'any_name',
+        id: 'any_id'
+      })))
+    const httpRequest = {
+      body: {
+        email: 'already_used_email',
+        name: 'valid_name',
+        password: 'valid_password'
+      }
+    }
+    const httpResponse = await sut.perform(httpRequest)
+    expect(httpResponse.statusCode).toBe(409)
   })
 })
