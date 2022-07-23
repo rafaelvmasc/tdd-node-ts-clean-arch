@@ -1,4 +1,4 @@
-import { Collection } from 'mongodb'
+import { Collection, ObjectId } from 'mongodb'
 import { AccountRepository } from './account-repository'
 import { MongoHelper } from '../helpers/mongo-helper'
 
@@ -79,11 +79,11 @@ describe('Account MongoDB Repository', () => {
     const fakeAccount = await accountCollection.findOne({ _id: res.insertedId })
     expect(fakeAccount?.accessToken).toBeFalsy()
     const payload = {
-      id: fakeAccount?._id,
+      id: fakeAccount?._id.toString() ?? '',
       token: 'any_token'
     }
     await sut.updateToken(payload)
-    const account = await accountCollection.findOne({ _id: fakeAccount?._id })
+    const account = await accountCollection.findOne({ _id: new ObjectId(fakeAccount?._id) })
     expect(account).toBeTruthy()
     expect(account?.accessToken).toEqual('any_token')
   })
