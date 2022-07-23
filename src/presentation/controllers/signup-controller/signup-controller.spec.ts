@@ -141,4 +141,18 @@ describe('SignUp Controller', () => {
     const httpResponse = await sut.perform(httpRequest)
     expect(httpResponse.statusCode).toBe(409)
   })
+
+  test('Should call LoadUser with correct email', async () => {
+    const { sut, loadUserStub } = makeSut()
+    const executeSpy = jest.spyOn(loadUserStub, 'execute')
+    const httpRequest = {
+      body: {
+        email: 'any_email',
+        name: 'valid_name',
+        password: 'valid_password'
+      }
+    }
+    await sut.perform(httpRequest)
+    expect(executeSpy).toHaveBeenCalledWith({ email: 'any_email' })
+  })
 })
