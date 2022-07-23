@@ -7,5 +7,5 @@ export const makeAddAccountService = (): AddAccountUseCase => {
   const salt = 12
   const hasher = new BCryptAdapter(salt)
   const repository = new AccountRepository()
-  return new DbAddAccountService(hasher, repository)
+  return new DbAddAccountService(hasher,repository, repository)
 }
