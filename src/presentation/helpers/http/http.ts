@@ -1,4 +1,4 @@
-import { ServerError, UnauthorizedError } from '../../errors'
+import { ConflictError, ServerError, UnauthorizedError } from '../../errors'
 
 export interface HttpResponse {
   statusCode: number
@@ -27,4 +27,9 @@ export const success = (data: any): HttpResponse => ({
 export const unauthorized = (): HttpResponse => ({
   statusCode: 401,
   body: new UnauthorizedError()
+})
+
+export const conflict = (): HttpResponse => ({
+  statusCode: 409,
+  body: new ConflictError()
 })

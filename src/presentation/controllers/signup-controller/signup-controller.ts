@@ -1,5 +1,5 @@
 import { AddAccountUseCase, LoadUserUseCase } from '../../../domain/usecases'
-import { badRequest, HttpRequest, HttpResponse, serverError, success } from '../../helpers/http/http'
+import { badRequest, conflict, HttpRequest, HttpResponse, serverError, success } from '../../helpers/http/http'
 import { Validation } from '../../protocols/validation'
 import { Controller } from '../../protocols/controller'
 
@@ -16,12 +16,7 @@ export class SignUpController implements Controller {
       if (error) return badRequest(error)
       const { email, password, name } = httpRequest.body
       const user = await this.loadUser.execute({ email })
-      if (user) {
-        return {
-          statusCode: 409,
-          body: {}
-        }
-      }
+      if (user) return conflict()
       const result = await this.addAccount.execute({ email, password, name })
 
       return success(result)
