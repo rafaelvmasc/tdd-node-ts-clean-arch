@@ -11,5 +11,5 @@ export namespace AddAccountUseCase {
     email: string
   }
 
-  export type Result = AccountEntity
+  export type Result = AccountEntity | null
 }
