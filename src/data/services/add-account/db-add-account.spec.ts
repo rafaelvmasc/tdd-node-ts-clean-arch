@@ -124,7 +124,7 @@ describe('DBAddAccount Service', () => {
       }))
     )
     const result = await sut.execute(makeFakeAccountData())
-    expect(result).toBeFalsy()
+    expect(result).toBeNull()
   })
 
   test('Should throw if LoadAccountByEmailRepository throws', async () => {
