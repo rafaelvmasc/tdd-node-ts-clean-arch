@@ -1,4 +1,5 @@
-import { AddAccountUseCase } from '../../../domain/usecases'
+import { CredentialsEntity } from '../../../domain/entities'
+import { AddAccountUseCase, AuthenticationUseCase } from '../../../domain/usecases'
 import { ServerError } from '../../errors'
 import { badRequest, conflict, HttpRequest, success } from '../../helpers/http/http'
 import { Validation } from '../../protocols/validation'
@@ -8,6 +9,7 @@ interface SutTypes {
   sut: SignUpController
   addAccountStub: AddAccountUseCase
   validationStub: Validation
+  authenticationStub: AuthenticationUseCase
 }
 
 const makeValidation = (): Validation => {
@@ -30,6 +32,19 @@ const makeFakeRequest = (): HttpRequest => {
   }
 }
 
+const makeAuthentication = (): AuthenticationUseCase => {
+  class AuthenticationStub implements AuthenticationUseCase {
+    async perform (params: CredentialsEntity): Promise<AuthenticationUseCase.Result> {
+      return new Promise(
+        resolve => resolve({
+          token: 'valid_token'
+        })
+      )
+    }
+  }
+  return new AuthenticationStub()
+}
+
 const makeAddAccount = (): AddAccountUseCase => {
   class AddAccountStub implements AddAccountUseCase {
     async execute (
@@ -50,11 +65,13 @@ const makeAddAccount = (): AddAccountUseCase => {
 const makeSut = (): SutTypes => {
   const addAccountStub = makeAddAccount()
   const validationStub = makeValidation()
-  const sut = new SignUpController(addAccountStub, validationStub)
+  const authenticationStub = makeAuthentication()
+  const sut = new SignUpController(addAccountStub,authenticationStub, validationStub)
   return {
     sut,
     addAccountStub,
-    validationStub
+    validationStub,
+    authenticationStub
   }
 }
 
@@ -85,10 +102,7 @@ describe('SignUp Controller', () => {
     const httpResponse = await sut.perform(httpRequest)
     expect(httpResponse).toEqual(
       success({
-        id: 'valid_id',
-        name: 'valid_name',
-        password: 'valid_password',
-        email: 'valid_email@mail.com'
+        token: 'valid_token'
       })
     )
   })
@@ -124,5 +138,16 @@ describe('SignUp Controller', () => {
     }
     const httpResponse = await sut.perform(httpRequest)
     expect(httpResponse).toEqual(conflict('already_used_email is already in use'))
+  })
+
+  test('Should call Authentication with correct values', async () => {
+    const { sut, authenticationStub } = makeSut()
+    const validateSpy = jest.spyOn(authenticationStub, 'perform')
+    const httpRequest = makeFakeRequest()
+    await sut.perform(httpRequest)
+    expect(validateSpy).toBeCalledWith({
+      email: httpRequest.body.email,
+      password: httpRequest.body.password
+    })
   })
 })
