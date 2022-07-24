@@ -2,6 +2,7 @@ version: 2.1
 orbs:
   node: circleci/node@5.0.2
   heroku: circleci/heroku@1.2.6
+  coveralls: coveralls/coveralls@1.0.6
 jobs:
   test:
     executor:  node/default
@@ -12,6 +13,7 @@ jobs:
       - run:
           command: npm run test:ci
           name: Run tests
+      - coveralls/upload
   build:
     executor: node/default
     steps:
