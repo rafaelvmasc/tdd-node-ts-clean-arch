@@ -1,4 +1,4 @@
-FROM node:16.16.0 AS clean-node-api
+FROM node:16.16.0
 
 WORKDIR /app
 
