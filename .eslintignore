@@ -2,3 +2,4 @@ node_nodules
 dist
 .tf
 coverage
+data
