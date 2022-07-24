@@ -10,10 +10,10 @@ services:
       - "27017:27017"
   api:
     container_name: api-container
-    build: .
-    image: clean-node-api
+    image: node:16.16.0
+    working_dir: /app
     restart: always
-    command: npm run debug
+    command: bash -c "npm set-script prepare "" && npm install --omit=dev && npm run debug"
     volumes:
       - ./dist:/app/dist/
       - ./package.json:/app/package.json
