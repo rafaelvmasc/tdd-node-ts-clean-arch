@@ -22,9 +22,9 @@ jobs:
           command: npm run build
           name: Build app
 workflows:
-  sample:
+  test_and_build:
     jobs:
       - test
       - build:
-        requires:
-          - test
+          requires:
+            - test
